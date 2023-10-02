@@ -1,31 +1,14 @@
-import { useState } from 'react';
+import useSort from '../hooks/use-sort';
 import Table from './Table';
 import { GoChevronDown, GoChevronUp } from 'react-icons/go';
 
 function SortableTable(props) {
-  const [sortedOrder, setSortedOrder] = useState(null);
-  const [sortBy, setSortBy] = useState(null);
-
   const { config, data } = props;
 
-  const handleClick = (label) => {
-    if (sortBy && label !== sortBy) {
-      setSortedOrder('asc');
-      setSortBy(label);
-      return;
-    }
-
-    if (sortedOrder === null) {
-      setSortedOrder('asc');
-      setSortBy(label);
-    } else if (sortedOrder === 'asc') {
-      setSortedOrder('desc');
-      setSortBy(label);
-    } else if (sortedOrder === 'desc') {
-      setSortedOrder(null);
-      setSortBy(label);
-    }
-  };
+  const { sortedOrder, sortedData, sortBy, setSortColumn } = useSort(
+    data,
+    config
+  );
 
   const updatedConfig = config.map((column) => {
     if (!column.sortValue) {
@@ -37,7 +20,7 @@ function SortableTable(props) {
         return (
           <th
             className="cursor-pointer hover:bg-gray-100"
-            onClick={() => handleClick(column.label)}
+            onClick={() => setSortColumn(column.label)}
           >
             <div className="flex items-center">
               {getIcons(column.label, sortBy, sortedOrder)}
@@ -49,24 +32,6 @@ function SortableTable(props) {
     };
   });
 
-  let sortedData = data;
-  if (sortedOrder && sortBy) {
-    const { sortValue } = config.find(
-      (column) => column.label === sortBy
-    );
-    sortedData = [...data].sort((a, b) => {
-      const valueA = sortValue(a);
-      const valueB = sortValue(b);
-
-      const reverseOrder = sortedOrder === 'asc' ? 1 : -1;
-
-      if (typeof valueA === 'string') {
-        return valueA.localeCompare(valueB) * reverseOrder;
-      } else {
-        return (valueA - valueB) * reverseOrder;
-      }
-    });
-  }
   return (
     <div>
       <Table {...props} data={sortedData} config={updatedConfig} />

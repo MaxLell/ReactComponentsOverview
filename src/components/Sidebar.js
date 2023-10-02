@@ -7,6 +7,7 @@ function Sidebar() {
     { label: 'Several ugly Buttons', path: '/button' },
     { label: 'Modal', path: '/modal' },
     { label: 'Table', path: '/table' },
+    { label: 'Counter', path: '/counter' },
   ];
 
   const renderedLinks = links.map((linkObject) => {
